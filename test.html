@@ -2,8 +2,9 @@
 <html>
   <head>
     <title>Google Maps JavaScript API v3 Example: Places Autocomplete</title>
-    <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyB__HxW-5uZn2InPTkvztc0mk_DQ7XhpOA&sensor=true&libraries=places"
+    <script src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places"
       type="text/javascript"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
     <style type="text/css">
     html{
@@ -17,6 +18,7 @@
       #map_canvas {
         height: 100%;
       }
+	  
     </style>
 
     <script type="text/javascript">
@@ -34,6 +36,7 @@
     
         var input = document.getElementById('searchTextField');
         var autocomplete = new google.maps.places.Autocomplete(input);
+		var service = new google.maps.places.PlacesService(map);
     
         autocomplete.bindTo('bounds', map);
     
@@ -41,7 +44,22 @@
         var marker = new google.maps.Marker({
             map: map
         });
-        
+		var markerList = new Array();
+        function createMarker(placeResult){
+			var marker = new google.maps.Marker({
+				map: map
+			});
+			marker.setPosition(placeResult.geometry.location);
+			var infowindow = new google.maps.InfoWindow();
+			infowindow.setContent(placeResult.name+'<br />'+placeResult.formatted_address);
+			google.maps.event.addListener(marker, 'click', function(){
+				map.setCenter(marker.getPosition());
+				infowindow.open(map, marker);
+			});
+			markerList.push(marker);
+			return marker;
+		}
+		
         marker.setPosition(map.getCenter());
         infowindow.setContent('<div><strong>You are here</strong><br>');
         infowindow.open(map, marker);
@@ -50,43 +68,42 @@
             infowindow.setContent('<div><strong>You are here</strong><br>');
             infowindow.open(map, marker);
         });
-            
-        
+
         google.maps.event.addListener(autocomplete, 'place_changed', function () {
-            infowindow.close();
-            var place = autocomplete.getPlace();
-            if (place.geometry.viewport) {
-                map.fitBounds(place.geometry.viewport);
-            }
-            else {
-                map.setCenter(place.geometry.location);
-                map.setZoom(17); // Why 17? Because it looks good.
-            }
-            marker.setPosition(place.geometry.location);
-    
-            var address = '';
-            if (place.address_components) {
-                address = [(place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
-            }
-    
-            infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
-            infowindow.open(map, marker);
+			var place = autocomplete.getPlace();
+			if(place.id==undefined){
+				searchRequest = {
+					bounds: map.getBounds(),
+					keyword: $("#searchTextField").value
+				};
+				function searchCallback(results, status) {
+					if (status == google.maps.places.PlacesServiceStatus.OK) {
+						for (var i = 0; i < results.length; i++) {
+							createMarker(results[i]);
+						}
+					}
+				}
+				service.search(searchRequest,searchCallback);
+			}
+            else{
+				if (place.geometry.viewport) {
+					map.fitBounds(place.geometry.viewport);
+				}
+				else {
+					map.setCenter(place.geometry.location);
+					map.setZoom(17); // Why 17? Because it looks good.
+				}
+				marker.setPosition(place.geometry.location);
+		
+				var address = '';
+				if (place.address_components) {
+					address = [(place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
+				}
+		
+				infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);
+				infowindow.open(map, marker);
+			}
         });
-    
-        // Sets a listener on a radio button to change the filter type on Places
-        // Autocomplete.
-    
-    
-        function setupClickListener(id, types) {
-            var radioButton = document.getElementById(id);
-            google.maps.event.addDomListener(radioButton, 'click', function () {
-                autocomplete.setTypes(types);
-            });
-        }
-    
-        setupClickListener('changetype-all', []);
-        setupClickListener('changetype-establishment', ['establishment']);
-        setupClickListener('changetype-geocode', ['geocode']);
     }
     google.maps.event.addDomListener(window, 'load', initialize);
     </script>
@@ -95,14 +112,6 @@
   <body>
     <div>
       <input id="searchTextField" type="text" size="50">
-      <input type="radio" name="type" id="changetype-all" checked="checked">
-      <label for="changetype-all">All</label>
-
-      <input type="radio" name="type" id="changetype-establishment">
-      <label for="changetype-establishment">Establishments</label>
-
-      <input type="radio" name="type" id="changetype-geocode">
-      <label for="changetype-geocode">Geocodes</label>
     </div>
     <div id="map_canvas"></div>
   </body>
