@@ -151,13 +151,13 @@ html {
   }
   #todo-list .todo-location{
 	position: absolute;
-    right: 30px;
-    top: 14px;
+    right: 35px;
+    top: 12px;
     display: none;
     cursor: pointer;
     width: 20px;
     height: 20px;
-    background: url(destroy.png) no-repeat 0 0;
+    background: url(addloc.png) no-repeat 0 0;
 	opacity:0.5;
 	filter:alpha(opacity=50); /* For IE8 and earlier */
   }
