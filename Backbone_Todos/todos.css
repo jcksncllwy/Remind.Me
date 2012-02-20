@@ -129,6 +129,16 @@ html {
       -o-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
       box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
     }
+  #todo-list .location {
+    display: none;
+  }
+	#todo-list .editingLocation .location {
+		display: block;
+	}
+	#todo-list .location .map_canvas{
+		height:100%;
+		width:100%;
+	}
   #todo-list .check {
     position: relative;
     top: 9px;
@@ -139,6 +149,27 @@ html {
     text-decoration: line-through;
     color: #777777;
   }
+  #todo-list .todo-location{
+	position: absolute;
+    right: 30px;
+    top: 14px;
+    display: none;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    background: url(destroy.png) no-repeat 0 0;
+	opacity:0.5;
+	filter:alpha(opacity=50); /* For IE8 and earlier */
+  }
+  #todo-list li:hover .todo-location {
+      display: block;
+    }
+    #todo-list .todo-location:hover {
+      /*background-position: 0 -20px;*/
+	  opacity:1;
+	  filter:alpha(opacity=100); /* For IE8 and earlier */
+    }
+  
   #todo-list .todo-destroy {
     position: absolute;
     right: 5px;

@@ -5,6 +5,12 @@
 
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
+	
+	navigator.geolocation.getCurrentPosition(setLocation);
+	
+	function setLocation(location){
+		userLocation = location;
+	}
 
   // Todo Model
   // ----------
@@ -83,6 +89,7 @@ $(function(){
     events: {
       "click .check"              : "toggleDone",
       "dblclick div.todo-text"    : "edit",
+	  "click span.todo-location"  : "toggleLocation",
       "click span.todo-destroy"   : "clear",
       "keypress .todo-input"      : "updateOnEnter"
     },
@@ -119,15 +126,43 @@ $(function(){
       $(this.el).addClass("editing");
       this.input.focus();
     },
+	
+	toggleLocation: function() {
+		if($(this.el).hasClass("editingLocation")){
+			this.closeLocation();
+		}
+		else{
+			this.editLocation();
+		}
+	},
+	
+	editLocation: function() {
+		$(this.el).addClass("editingLocation");
+		var mapOptions = {
+            center: new google.maps.LatLng(userLocation.coords.latitude, userLocation.coords.longitude),
+            zoom: 17,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(this.$('.map_canvas'), mapOptions);
+	},
 
     // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
       this.model.save({text: this.input.val()});
       $(this.el).removeClass("editing");
     },
+	
+	closeLocation: function() {
+      this.model.save({location: ''});
+      $(this.el).removeClass("editingLocation");
+    },
 
     // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
+      if (e.keyCode == 13) this.close();
+    },
+	
+	updateOnEnter: function(e) {
       if (e.keyCode == 13) this.close();
     },
 
@@ -139,8 +174,16 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.model.destroy();
-    }
+    },
 
+	renderMap: function(map_canvas, searchInput) {
+		var mapOptions = {
+            center: new google.maps.LatLng(userLocation.coords.latitude, userLocation.coords.longitude),
+            zoom: 17,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(map_canvas, mapOptions);
+	}
   });
 
   // The Application
