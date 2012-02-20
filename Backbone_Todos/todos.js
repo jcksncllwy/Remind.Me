@@ -151,7 +151,7 @@ $(function(){
       this.model.save({location: ''});
       $(this.el).removeClass("editingLocation");
 	  $("#map_canvas").remove();
-	  $("#searchFieldText").remove();
+	  $("#searchTextField").remove();
     },
 
     // If you hit `enter`, we're through editing the item.
