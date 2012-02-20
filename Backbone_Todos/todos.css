@@ -131,13 +131,15 @@ html {
     }
   #todo-list .location {
     display: none;
+	height:100%;
+	width:100%;
   }
 	#todo-list .editingLocation .location {
 		display: block;
 	}
 	#todo-list .location .map_canvas{
-		height:100%;
-		width:100%;
+		height:100px;
+		width:100px;
 	}
   #todo-list .check {
     position: relative;
@@ -186,15 +188,6 @@ html {
     #todo-list .todo-destroy:hover {
       background-position: 0 -20px;
     }
-
-
-   
-   
-   
-
-    
-    
-    
 
 #todo-stats {
   *zoom: 1;

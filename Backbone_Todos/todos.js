@@ -138,12 +138,7 @@ $(function(){
 	
 	editLocation: function() {
 		$(this.el).addClass("editingLocation");
-		var mapOptions = {
-            center: new google.maps.LatLng(userLocation.coords.latitude, userLocation.coords.longitude),
-            zoom: 17,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        var map = new google.maps.Map(this.$('.map_canvas'), mapOptions);
+		this.renderMap();
 	},
 
     // Close the `"editing"` mode, saving changes to the todo.
@@ -155,6 +150,8 @@ $(function(){
 	closeLocation: function() {
       this.model.save({location: ''});
       $(this.el).removeClass("editingLocation");
+	  $("#map_canvas").remove();
+	  $("#searchFieldText").remove();
     },
 
     // If you hit `enter`, we're through editing the item.
@@ -176,13 +173,45 @@ $(function(){
       this.model.destroy();
     },
 
-	renderMap: function(map_canvas, searchInput) {
+	renderMap: function() {
+		this.$(".location").append("<input id='searchTextField' type='text' size='50'>");
+		this.$(".location").append("<div style='height: 480px; width: 480px' id='map_canvas'></div>");
 		var mapOptions = {
             center: new google.maps.LatLng(userLocation.coords.latitude, userLocation.coords.longitude),
             zoom: 17,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-        var map = new google.maps.Map(map_canvas, mapOptions);
+        var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+		var input = document.getElementById('searchTextField');
+        var autocomplete = new google.maps.places.Autocomplete(input);
+		var service = new google.maps.places.PlacesService(map);
+    
+        autocomplete.bindTo('bounds', map);
+    
+        var infowindow = new google.maps.InfoWindow();
+        var marker = new google.maps.Marker({
+            map: map
+        });
+		google.maps.event.addListener(autocomplete, 'place_changed', function () {
+			var place = autocomplete.getPlace();
+			if (place.geometry.viewport) {
+				map.fitBounds(place.geometry.viewport);
+			}
+			else {
+				map.setCenter(place.geometry.location);
+				map.setZoom(17); // Why 17? Because it looks good.
+			}
+			marker.setPosition(place.geometry.location);
+	
+			var address = '';
+			if (place.address_components) {
+				address = [(place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
+			}
+	
+			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button>Add Place</button>');
+			infowindow.open(map, marker);
+			
+        });
 	}
   });
 
