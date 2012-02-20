@@ -180,12 +180,21 @@ html {
     height: 20px;
     background: url(destroy.png) no-repeat 0 0;
   }
-    #todo-list li:hover .todo-destroy {
+   #todo-list li:hover .todo-destroy {
       display: block;
     }
     #todo-list .todo-destroy:hover {
       background-position: 0 -20px;
     }
+
+
+   
+   
+   
+
+    
+    
+    
 
 #todo-stats {
   *zoom: 1;

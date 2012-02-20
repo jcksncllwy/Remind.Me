@@ -2,7 +2,7 @@
 <html>
 
   <head>
-    <title>Backbone Demo: Todos</title>
+    <title>Remind.Me</title>
     <link href="todos.css" media="all" rel="stylesheet" type="text/css"/>
     <script src="lib/json2.js"></script>
     <script src="lib/jquery-1.7.1.js"></script>
@@ -20,14 +20,14 @@
     <div id="todoapp">
 
       <div class="title">
-        <h1>Todos</h1>
+        <h1>Remind.Me</h1>
       </div>
 
       <div class="content">
 
         <div id="create-todo">
 
-          <input id="new-todo" placeholder="What needs to be done?" type="text" />
+          <input id="new-todo" placeholder="Add a Reminder" type="text" />
           <span class="ui-tooltip-top" style="display:none;">Press Enter to save this task</span>
         </div>
 
@@ -55,13 +55,14 @@
     <!-- Templates -->
 
     <script type="text/template" id="item-template">
-      <div class="todo <%= done ? 'done' : '' %>">
-        <div class="display">
+      <div class="todo <%= done ? 'done' : '' %>">  
+          <div class="display">
           <input class="check" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
           <div class="todo-text"></div>
 		  <span class="todo-location"></span>
           <span class="todo-destroy"></span>
         </div>
+        
         <div class="edit">
           <input class="todo-input" type="text" value="" />
         </div>
