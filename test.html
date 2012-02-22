@@ -72,7 +72,21 @@
 
         google.maps.event.addListener(autocomplete, 'place_changed', function () {
 			var place = autocomplete.getPlace();
-            
+			if(place.id==undefined){
+				searchRequest = {
+					bounds: map.getBounds(),
+					keyword: $("#searchTextField").val()
+				};
+				function searchCallback(results, status) {
+					if (status == google.maps.places.PlacesServiceStatus.OK) {
+						for (var i = 0; i < results.length; i++) {
+							createMarker(results[i]);
+						}
+					}
+				}
+				service.search(searchRequest,searchCallback);
+			}
+            else{
 				if (place.geometry.viewport) {
 					map.fitBounds(place.geometry.viewport);
 				}
@@ -89,7 +103,7 @@
 		
 				infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button>Add Place</button>');
 				infowindow.open(map, marker);
-			
+			}
         });
     }
     google.maps.event.addDomListener(window, 'load', initialize);

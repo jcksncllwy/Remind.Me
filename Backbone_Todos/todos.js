@@ -91,7 +91,8 @@ $(function(){
       "dblclick div.todo-text"    : "edit",
 	  "click span.todo-location"  : "toggleLocation",
       "click span.todo-destroy"   : "clear",
-      "keypress .todo-input"      : "updateOnEnter"
+      "keypress .todo-input"      : "updateOnEnter",
+	  "click button.addPlace"	  : "addPlace"
     },
 
     // The TodoView listens for changes to its model, re-rendering.
@@ -148,18 +149,27 @@ $(function(){
     },
 	
 	closeLocation: function() {
-      this.model.save({location: ''});
       $(this.el).removeClass("editingLocation");
-	  $("#map_canvas").remove();
-	  $("#searchTextField").remove();
+	  this.$(".map_canvas").remove();
+	  this.$(".searchTextField").remove();
     },
+	
+	addPlace: function(e){
+		var placeName = e.target.name;
+		var placeRef = e.target.id;
+		if(this.model.has('locations')){
+			newLocations = this.model.get('locations');
+			newLocations[placeName] = placeRef;
+		}
+		else{
+			newLocations = new Array();
+			newLocations[placeName] = placeRef;
+		}
+		this.model.save({locations: newLocations});
+	},
 
     // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
-      if (e.keyCode == 13) this.close();
-    },
-	
-	updateOnEnter: function(e) {
       if (e.keyCode == 13) this.close();
     },
 
@@ -174,45 +184,91 @@ $(function(){
     },
 
 	renderMap: function() {
-		this.$(".location").append("<input id='searchTextField' type='text' size='50'>");
-		this.$(".location").append("<div style='height: 480px; width: 480px' id='map_canvas'></div>");
+		this.$(".location").append("<input class='searchTextField' type='text' size='50'>");
+		this.$(".location").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
 		var mapOptions = {
             center: new google.maps.LatLng(userLocation.coords.latitude, userLocation.coords.longitude),
             zoom: 17,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
-        var map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-		var input = document.getElementById('searchTextField');
+        var map = new google.maps.Map(this.$(".map_canvas")[0], mapOptions);
+		var input = this.$(".searchTextField")[0];
         var autocomplete = new google.maps.places.Autocomplete(input);
 		var service = new google.maps.places.PlacesService(map);
-    
         autocomplete.bindTo('bounds', map);
+		
+		google.maps.event.addListener(map, 'bounds_changed', function (){
+			if(input.value && input.value!=''){
+				google.maps.event.trigger(autocomplete, 'place_changed');
+			}
+		});
     
         var infowindow = new google.maps.InfoWindow();
         var marker = new google.maps.Marker({
             map: map
         });
-		google.maps.event.addListener(autocomplete, 'place_changed', function () {
-			var place = autocomplete.getPlace();
-			if (place.geometry.viewport) {
-				map.fitBounds(place.geometry.viewport);
-			}
-			else {
-				map.setCenter(place.geometry.location);
-				map.setZoom(17); // Why 17? Because it looks good.
-			}
-			marker.setPosition(place.geometry.location);
-	
+		var markerList = new Array();
+		var infoWindowList = new Array();
+		function createMarker(placeResult){
+			var marker = new google.maps.Marker({
+				map: map
+			});
+			marker.setPosition(placeResult.geometry.location);
+			google.maps.event.addListener(marker, 'click', function(){
+				map.setCenter(marker.getPosition());
+			});
+			createInfoWindow(placeResult, marker);
+			markerList.push(marker);
+			return marker;
+		}
+		
+		function createInfoWindow(place, marker){
+			var infowindow = new google.maps.InfoWindow();
 			var address = '';
 			if (place.address_components) {
 				address = [(place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
 			}
-	
-			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button>Add Place</button>');
-			infowindow.open(map, marker);
-			
+			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button class="addPlace" name="'+place.name+'" id='+place.reference+'>Add Place</button>'); //onClick="window.TodoView.prototype.addPlace(\''+place.reference+'\')"
+			google.maps.event.addListener(marker, 'click', function(){
+				for(var i = 0; i<infoWindowList.length; i++){
+					infoWindowList[i].close();
+				}
+				infowindow.open(map, marker);
+			});
+			infoWindowList.push(infowindow);
+		}
+		
+		google.maps.event.addListener(autocomplete, 'place_changed', function () {
+			var place = autocomplete.getPlace();
+			if(place.id==undefined){
+				searchRequest = {
+					bounds: map.getBounds(),
+					keyword: input.value
+				};
+				function searchCallback(results, status) {
+					if (status == google.maps.places.PlacesServiceStatus.OK) {
+						for (var i = 0; i < results.length; i++) {
+							createMarker(results[i]);
+						}
+					}
+				}
+				service.search(searchRequest,searchCallback);
+			}
+            else{
+				if (place.geometry.viewport) {
+					map.fitBounds(place.geometry.viewport);
+				}
+				else {
+					map.setCenter(place.geometry.location);
+					map.setZoom(17); // Why 17? Because it looks good.
+				}
+				marker.setPosition(place.geometry.location);
+				createInfoWindow(place,marker);
+				google.maps.event.trigger(marker,'click');
+			}
         });
 	}
+	
   });
 
   // The Application
