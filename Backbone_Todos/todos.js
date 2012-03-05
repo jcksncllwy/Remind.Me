@@ -239,19 +239,9 @@ $(function(){
         var autocomplete = new google.maps.places.Autocomplete(input);
 		var service = new google.maps.places.PlacesService(map);
         autocomplete.bindTo('bounds', map);
+				
+				
 		
-		google.maps.event.addListener(map, 'bounds_changed', function (){
-			if(input.value && input.value!=''){
-				google.maps.event.trigger(autocomplete, 'place_changed');
-			}
-		});
-    
-        var infowindow = new google.maps.InfoWindow();
-        var marker = new google.maps.Marker({
-            map: map
-        });
-		var markerList = new Array();
-		var infoWindowList = new Array();
 		function createMarker(placeResult){
 			var marker = new google.maps.Marker({
 				map: map
@@ -261,7 +251,6 @@ $(function(){
 				map.setCenter(marker.getPosition());
 			});
 			createInfoWindow(placeResult, marker);
-			markerList.push(marker);
 			return marker;
 		}
 		
@@ -278,22 +267,48 @@ $(function(){
 				}
 				infowindow.open(map, marker);
 			});
-			infoWindowList.push(infowindow);
 		}
+		
+		var expandSearch = function(){
+			
+			searchRequest = {
+				bounds: map.getBounds(),
+				keyword: input.value
+			};
+			function searchCallback(results, status) {
+				if (status == google.maps.places.PlacesServiceStatus.OK) {
+					for (var i = 0; i < results.length; i++) {
+						createMarker(results[i]);
+					}
+				}
+			}
+			
+		};
+		
+		google.maps.event.addListener(map, 'bounds_changed', function (){
+			if(input.value && input.value!=''){
+				expandSearch();
+			}
+		});
 		
 		google.maps.event.addListener(autocomplete, 'place_changed', function () {
 			var place = autocomplete.getPlace();
 			if(place.id==undefined){
+				searchCompleted = false;
 				searchRequest = {
 					bounds: map.getBounds(),
 					keyword: input.value
 				};
 				function searchCallback(results, status) {
+					var resultsBounds = new google.maps.LatLngBounds();
 					if (status == google.maps.places.PlacesServiceStatus.OK) {
 						for (var i = 0; i < results.length; i++) {
 							createMarker(results[i]);
+							resultsBounds.extend(results[i].geometry.location);
+							map.fitBounds(resultsBounds);
 						}
 					}
+					searchCompleted = true;
 				}
 				service.search(searchRequest,searchCallback);
 			}
@@ -305,9 +320,7 @@ $(function(){
 					map.setCenter(place.geometry.location);
 					map.setZoom(17); // Why 17? Because it looks good.
 				}
-				marker.setPosition(place.geometry.location);
-				createInfoWindow(place,marker);
-				google.maps.event.trigger(marker,'click');
+				map.setCenter(createMarker(place).getPosition());
 			}
         });
 	}
