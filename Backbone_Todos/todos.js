@@ -87,12 +87,15 @@ $(function(){
 
     // The DOM events specific to an item.
     events: {
+     //the left hand side are DOM events, right side function 
       "click .check"              : "toggleDone",
       "dblclick div.todo-text"    : "edit",
+      "click span.todo-time"      : "toggleTime",
 	  "click span.todo-location"  : "toggleLocation",
       "click span.todo-destroy"   : "clear",
       "keypress .todo-input"      : "updateOnEnter",
-	  "click button.addPlace"	  : "addPlace"
+	  "click button.addPlace"	  : "addPlace",
+	 // "click button.addTime"      : "addTime"
     },
 
     // The TodoView listens for changes to its model, re-rendering.
@@ -128,6 +131,32 @@ $(function(){
       this.input.focus();
     },
 	
+	
+	//Time-Related functions...
+	toggleTime: function() {
+		if($(this.el).hasClass("editingTime")){
+			this.closeTime();
+		}
+		else{
+			this.editTime();
+		}
+	},
+	
+	editTime: function() {
+		$(this.el).addClass("editingTime");
+		this.renderTime();
+		/* I may need to render Time JS here*/
+	},
+	
+	closeTime: function() {
+		$(this.el).removeClass("editingTime");
+		this.$(".timeInput").remove();
+		this.$(".dateInput").remove();
+		/* I may need to remove the calendar buttons*/
+	},
+	
+	
+	//Location-Related functions...
 	toggleLocation: function() {
 		if($(this.el).hasClass("editingLocation")){
 			this.closeLocation();
@@ -153,6 +182,12 @@ $(function(){
 	  this.$(".map_canvas").remove();
 	  this.$(".searchTextField").remove();
     },
+	
+	
+	addTime: function(e){
+		var todoTime = e.target.name;
+		var todoRef = e.target.id;
+	},
 	
 	addPlace: function(e){
 		var placeName = e.target.name;
@@ -182,7 +217,15 @@ $(function(){
     clear: function() {
       this.model.destroy();
     },
-
+	
+	renderTime: function() {
+		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20', value= 'Enter a Time'>");
+		//this.$(".timeBlock").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
+		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20', value = 'Enter a Date'>");
+		
+	},
+	
+	
 	renderMap: function() {
 		this.$(".location").append("<input class='searchTextField' type='text' size='50'>");
 		this.$(".location").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
