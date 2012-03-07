@@ -27,7 +27,6 @@
       <div class="content">
 
         <div id="create-todo">
-
           <input id="new-todo" placeholder="Add a Reminder" type="text" />
           <span class="ui-tooltip-top" style="display:none;">Press Enter to save this task</span>
         </div>
@@ -48,9 +47,13 @@
     </ul>
 
     <div id="credits">
-      Created by
+      An Open Source Project by
       <br />
-      <a href="http://jgn.me/">J&eacute;r&ocirc;me Gravel-Niquet</a>
+      PJ Loury    Jackson Callaway    Aiyman Hadi
+      <br /> <br />
+      Based on the Work of
+      <br />
+      J&eacute;r&ocirc;me Gravel-Niquet</a>
     </div>
 
     <!-- Templates -->
@@ -60,12 +63,15 @@
           <div class="display">
           <input class="check" type="checkbox" <%= done ? 'checked="checked"' : '' %> />
           <div class="todo-text"></div>
+		  <span class="todo-time"></span>
 		  <span class="todo-location"></span>
           <span class="todo-destroy"></span>
         </div>
         
         <div class="edit">
           <input class="todo-input" type="text" value="" />
+        </div>
+        <div class="timeBlock">
         </div>
 		<div class="location">
 		</div>

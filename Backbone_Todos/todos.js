@@ -87,13 +87,16 @@ $(function(){
 
     // The DOM events specific to an item.
     events: {
+     //the left hand side are DOM events, right side function 
       "click .check"              : "toggleDone",
       "dblclick div.todo-text"    : "edit",
+      "click span.todo-time"      : "toggleTime",
 	  "click span.todo-location"  : "toggleLocation",
       "click span.todo-destroy"   : "clear",
       "keypress .todo-input"      : "updateOnEnter",
 	  "click button.addPlace"	  : "addPlace",
 	  "click button.removePlace"  : "removePlace"
+	 // "click button.addTime"      : "addTime"
     },
 
     // The TodoView listens for changes to its model, re-rendering.
@@ -132,6 +135,32 @@ $(function(){
       this.input.focus();
     },
 	
+	
+	//Time-Related functions...
+	toggleTime: function() {
+		if($(this.el).hasClass("editingTime")){
+			this.closeTime();
+		}
+		else{
+			this.editTime();
+		}
+	},
+	
+	editTime: function() {
+		$(this.el).addClass("editingTime");
+		this.renderTime();
+		/* I may need to render Time JS here*/
+	},
+	
+	closeTime: function() {
+		$(this.el).removeClass("editingTime");
+		this.$(".timeInput").remove();
+		this.$(".dateInput").remove();
+		/* I may need to remove the calendar buttons*/
+	},
+	
+	
+	//Location-Related functions...
 	toggleLocation: function() {
 		if($(this.el).hasClass("editingLocation")){
 			this.closeLocation();
@@ -158,6 +187,12 @@ $(function(){
 	  this.$(".searchTextField").remove();
     },
 	
+	
+	addTime: function(e){
+		var todoTime = e.target.name;
+		var todoRef = e.target.id;
+	},
+	
 	addPlace: function(e){
 		var placeRef = e.target.id;
 		this.model.save({location: placeRef});
@@ -181,7 +216,15 @@ $(function(){
     clear: function() {
       this.model.destroy();
     },
-
+	
+	renderTime: function() {
+		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20', value= 'Enter a Time'>");
+		//this.$(".timeBlock").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
+		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20', value = 'Enter a Date'>");
+		
+	},
+	
+	
 	renderMap: function() {
 		var model = this.model;
 		this.$(".location").append("<input class='searchTextField' type='text' size='50'>");
@@ -196,7 +239,8 @@ $(function(){
         var autocomplete = new google.maps.places.Autocomplete(input);
 		var service = new google.maps.places.PlacesService(map);
         autocomplete.bindTo('bounds', map);
-		
+				
+				
 		/*
 		google.maps.event.addListener(map, 'bounds_changed', function (){
 			if(input.value && input.value!=''){
@@ -204,9 +248,6 @@ $(function(){
 			}
 		});
 		*/
-		
-		var markerList = new Array();
-		var infoWindowList = new Array();
 		function createMarker(placeResult){
 			var marker = new google.maps.Marker({
 				map: map
@@ -216,7 +257,6 @@ $(function(){
 				map.setCenter(marker.getPosition());
 			});
 			createInfoWindow(placeResult, marker);
-			markerList.push(marker);
 			return marker;
 		}
 		
@@ -239,8 +279,29 @@ $(function(){
 				}
 				infowindow.open(map, marker);
 			});
-			infoWindowList.push(infowindow);
 		}
+		
+		var expandSearch = function(){
+			
+			searchRequest = {
+				bounds: map.getBounds(),
+				keyword: input.value
+			};
+			function searchCallback(results, status) {
+				if (status == google.maps.places.PlacesServiceStatus.OK) {
+					for (var i = 0; i < results.length; i++) {
+						createMarker(results[i]);
+					}
+				}
+			}
+			
+		};
+		
+		google.maps.event.addListener(map, 'bounds_changed', function (){
+			if(input.value && input.value!=''){
+				expandSearch();
+			}
+		});
 		
 		google.maps.event.addListener(autocomplete, 'place_changed', function () {
 			for(var i = 0; i<markerList.length; i++){
@@ -248,16 +309,21 @@ $(function(){
 			}
 			var place = autocomplete.getPlace();
 			if(place.id==undefined){
+				searchCompleted = false;
 				searchRequest = {
 					bounds: map.getBounds(),
 					keyword: input.value
 				};
 				function searchCallback(results, status) {
+					var resultsBounds = new google.maps.LatLngBounds();
 					if (status == google.maps.places.PlacesServiceStatus.OK) {
 						for (var i = 0; i < results.length; i++) {
 							createMarker(results[i]);
+							resultsBounds.extend(results[i].geometry.location);
+							map.fitBounds(resultsBounds);
 						}
 					}
+					searchCompleted = true;
 				}
 				service.search(searchRequest,searchCallback);
 			}

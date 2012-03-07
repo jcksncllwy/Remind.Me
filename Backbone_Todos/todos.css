@@ -134,9 +134,18 @@ html {
 	height:100%;
 	width:100%;
   }
+	
 	#todo-list .editingLocation .location {
 		display: block;
 	}
+	
+	/*This CSS is for elements in the todo-list id that in the class
+	editing time and of th class timeBlock*/
+	#todo-list .editingTime .timeBlock {
+		display: block;
+	}
+	
+	
 	#todo-list .location .map_canvas{
 		height:100px;
 		width:100px;
@@ -151,6 +160,27 @@ html {
     text-decoration: line-through;
     color: #777777;
   }
+
+  #todo-list .todo-time{
+	position: absolute;
+    right: 60px;
+    top: 14px;
+    display: none;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    background: url(http://entypo.com/images/icons/048-Calendar-Icon.png) no-repeat 0 0;
+	opacity:0.5;
+	filter:alpha(opacity=50); /* For IE8 and earlier */
+  }
+  #todo-list li:hover .todo-time {
+      display: block;
+    }
+    #todo-list .todo-time:hover {
+	  opacity:1;
+	  filter:alpha(opacity=100); /* For IE8 and earlier */
+    }
+    
   #todo-list .todo-location{
 	position: absolute;
     right: 35px;
@@ -159,7 +189,7 @@ html {
     cursor: pointer;
     width: 20px;
     height: 20px;
-    background: url(addloc.png) no-repeat 0 0;
+    background: url(http://entypo.com/images/icons/016-Location-Icon.png) no-repeat 0 0;
 	opacity:0.5;
 	filter:alpha(opacity=50); /* For IE8 and earlier */
   }
@@ -167,8 +197,7 @@ html {
       display: block;
     }
     #todo-list .todo-location:hover {
-      /*background-position: 0 -20px;*/
-	  opacity:1;
+      opacity:1;
 	  filter:alpha(opacity=100); /* For IE8 and earlier */
     }
   
