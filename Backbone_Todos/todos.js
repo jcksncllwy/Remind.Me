@@ -5,7 +5,7 @@
 
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
-	
+	var userLocation;
 	navigator.geolocation.getCurrentPosition(setLocation);
 	
 	function setLocation(location){
@@ -92,7 +92,8 @@ $(function(){
 	  "click span.todo-location"  : "toggleLocation",
       "click span.todo-destroy"   : "clear",
       "keypress .todo-input"      : "updateOnEnter",
-	  "click button.addPlace"	  : "addPlace"
+	  "click button.addPlace"	  : "addPlace",
+	  "click button.removePlace"  : "removePlace"
     },
 
     // The TodoView listens for changes to its model, re-rendering.
@@ -105,6 +106,9 @@ $(function(){
     render: function() {
       $(this.el).html(this.template(this.model.toJSON()));
       this.setText();
+	  if($(this.el).hasClass("editingLocation")){
+		this.closeLocation();
+	  }
       return this;
     },
 
@@ -155,17 +159,12 @@ $(function(){
     },
 	
 	addPlace: function(e){
-		var placeName = e.target.name;
 		var placeRef = e.target.id;
-		if(this.model.has('locations')){
-			newLocations = this.model.get('locations');
-			newLocations[placeName] = placeRef;
-		}
-		else{
-			newLocations = new Array();
-			newLocations[placeName] = placeRef;
-		}
-		this.model.save({locations: newLocations});
+		this.model.save({location: placeRef});
+	},
+	
+	removePlace: function(e){
+		this.model.save({location: undefined});
 	},
 
     // If you hit `enter`, we're through editing the item.
@@ -184,6 +183,7 @@ $(function(){
     },
 
 	renderMap: function() {
+		var model = this.model;
 		this.$(".location").append("<input class='searchTextField' type='text' size='50'>");
 		this.$(".location").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
 		var mapOptions = {
@@ -197,16 +197,14 @@ $(function(){
 		var service = new google.maps.places.PlacesService(map);
         autocomplete.bindTo('bounds', map);
 		
+		/*
 		google.maps.event.addListener(map, 'bounds_changed', function (){
 			if(input.value && input.value!=''){
 				google.maps.event.trigger(autocomplete, 'place_changed');
 			}
 		});
-    
-        var infowindow = new google.maps.InfoWindow();
-        var marker = new google.maps.Marker({
-            map: map
-        });
+		*/
+		
 		var markerList = new Array();
 		var infoWindowList = new Array();
 		function createMarker(placeResult){
@@ -228,7 +226,13 @@ $(function(){
 			if (place.address_components) {
 				address = [(place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
 			}
-			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button class="addPlace" name="'+place.name+'" id='+place.reference+'>Add Place</button>'); //onClick="window.TodoView.prototype.addPlace(\''+place.reference+'\')"
+			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button class="addPlace" name="'+place.name+'" id='+place.reference+'>Set Place</button>');
+			if(model.has('locations')){
+				var locationList = model.get('locations');
+				if($.inArray(locationList,place.reference)){
+					infowindow.setContent(infowindow.getContent()+'<button class="removePlace" name="'+place.name+'" id='+place.reference+'>Remove Place</button>');
+				}
+			}
 			google.maps.event.addListener(marker, 'click', function(){
 				for(var i = 0; i<infoWindowList.length; i++){
 					infoWindowList[i].close();
@@ -239,6 +243,9 @@ $(function(){
 		}
 		
 		google.maps.event.addListener(autocomplete, 'place_changed', function () {
+			for(var i = 0; i<markerList.length; i++){
+				markerList[i].setMap(null);
+			}
 			var place = autocomplete.getPlace();
 			if(place.id==undefined){
 				searchRequest = {
@@ -262,11 +269,30 @@ $(function(){
 					map.setCenter(place.geometry.location);
 					map.setZoom(17); // Why 17? Because it looks good.
 				}
-				marker.setPosition(place.geometry.location);
-				createInfoWindow(place,marker);
-				google.maps.event.trigger(marker,'click');
+				var marker = createMarker(place);
 			}
         });
+		
+		if(this.model.has('location')){
+			var location = this.model.get('location');
+			if(location!=undefined){
+				var placeDetailsRequest;
+				placeDetailsRequest = {reference: location};
+				service.getDetails(placeDetailsRequest,
+				function(placeResult,placesServiceStatus){
+					createMarker(placeResult);
+					map.fitBounds(placeResult.geometry.viewport);
+				});
+			}
+		}
+	},
+	
+	showMap: function(){
+	
+	},
+	
+	hideMap: function(){
+	
 	}
 	
   });
