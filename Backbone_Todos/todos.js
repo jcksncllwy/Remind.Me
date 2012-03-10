@@ -22,7 +22,8 @@ $(function(){
     defaults: function() {
       return {
         done:  false,
-        order: Todos.nextOrder()
+        order: Todos.nextOrder(),
+		locationOrder: Todos.locationOrder()
       };
     },
 
@@ -63,6 +64,10 @@ $(function(){
       return this.last().get('order') + 1;
     },
 
+	locationOrder: function() {
+		
+	},
+	
     // Todos are sorted by their original insertion order.
     comparator: function(todo) {
       return todo.get('order');
@@ -154,8 +159,8 @@ $(function(){
 	
 	closeTime: function() {
 		$(this.el).removeClass("editingTime");
-		this.$(".timeInput").remove();
-		this.$(".dateInput").remove();
+		$(".timeInput").remove();
+		$(".dateInput").remove();
 		/* I may need to remove the calendar buttons*/
 	},
 	
@@ -195,7 +200,10 @@ $(function(){
 	
 	addPlace: function(e){
 		var placeRef = e.target.id;
+		var placeId = e.target.name;
+		console.log('derp' + placeId);
 		this.model.save({location: placeRef});
+		this.model.save({locationId: placeId});
 	},
 	
 	removePlace: function(e){
@@ -218,9 +226,10 @@ $(function(){
     },
 	
 	renderTime: function() {
-		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20', value= 'Enter a Time'>");
+		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20' value= 'Enter a Time'>");
 		//this.$(".timeBlock").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
-		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20', value = 'Enter a Date'>");
+		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20' value = 'Enter a Date'>");
+		
 		
 	},
 	
@@ -268,10 +277,10 @@ $(function(){
 			if (place.address_components) {
 				address = [(place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')].join(' ');
 			}
-			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button class="addPlace" name="'+place.name+'" id='+place.reference+'>Set Place</button>');
+			infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address + '<br /><button class="addPlace" name="'+place.id+'" id='+place.reference+'>Set Place</button>');
 			if(model.has('locations')){
-				var locationList = model.get('locations');
-				if($.inArray(locationList,place.reference)){
+				var locationId = model.get('locationId');
+				if(locationId == place.id){
 					infowindow.setContent(infowindow.getContent()+'<button class="removePlace" name="'+place.name+'" id='+place.reference+'>Remove Place</button>');
 				}
 			}
@@ -306,9 +315,6 @@ $(function(){
 		});
 		
 		google.maps.event.addListener(autocomplete, 'place_changed', function () {
-			for(var i = 0; i<markerList.length; i++){
-				markerList[i].setMap(null);
-			}
 			var place = autocomplete.getPlace();
 			if(place.id==undefined){
 				searchCompleted = false;
@@ -324,6 +330,9 @@ $(function(){
 							resultsBounds.extend(results[i].geometry.location);
 							map.fitBounds(resultsBounds);
 						}
+					}
+					else{
+						console.log(results);
 					}
 					searchCompleted = true;
 				}
