@@ -239,6 +239,8 @@ $(function(){
         var autocomplete = new google.maps.places.Autocomplete(input);
 		var service = new google.maps.places.PlacesService(map);
         autocomplete.bindTo('bounds', map);
+		var markerList = new Array();
+		var infoWindowList = new Array();
 				
 				
 		/*
