@@ -349,7 +349,7 @@ $(function(){
 				service.getDetails(placeDetailsRequest,
 				function(placeResult,placesServiceStatus){
 					createMarker(placeResult);
-					map.fitBounds(placeResult.geometry.viewport);
+					map.setCenter(placeResult.geometry.location);
 				});
 			}
 		}
