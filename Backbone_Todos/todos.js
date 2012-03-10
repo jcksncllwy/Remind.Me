@@ -218,9 +218,15 @@ $(function(){
     },
 	
 	renderTime: function() {
-		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20', value= 'Enter a Time'>");
+		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20' value= 'Enter a Time'>");
 		//this.$(".timeBlock").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
-		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20', value = 'Enter a Date'>");
+		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20' value = 'Enter a Date'>");
+	
+	/*
+		this.$('.timeInput').datetimepicker({
+		ampm: true
+		});
+	*/
 		
 	},
 	
