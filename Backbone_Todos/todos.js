@@ -245,9 +245,9 @@ $(function(){
 	
 	renderMap: function() {
 		var model = this.model;
-		
+		var contentWidth = $('.content').css('width');
 		this.$(".location").append("<input class='searchTextField' type='text' size='50'>");
-		this.$(".location").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
+		this.$(".location").append("<div style='height: 480px; width: "+contentWidth+"' class='map_canvas'></div>");
 		var mapOptions = {
             center: new google.maps.LatLng(userLocation.coords.latitude, userLocation.coords.longitude),
             zoom: 17,
