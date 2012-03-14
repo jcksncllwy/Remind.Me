@@ -40,7 +40,7 @@ html {
   }
 
 #todoapp {
-  width: 480px;
+  max-width: 480px;
   margin: 0 auto 40px;
   background: white;
   padding: 20px;
@@ -61,7 +61,7 @@ html {
   position: relative;
 }
   #create-todo input {
-    width: 466px;
+    width: 97.0833%; /* 466/488 */
     font-size: 24px;
     font-family: inherit;
     line-height: 1.4em;
@@ -163,7 +163,7 @@ html {
 
   #todo-list .todo-time{
 	position: absolute;
-    right: 60px;
+    right: 55px;
     top: 14px;
     display: none;
     cursor: pointer;
@@ -183,7 +183,7 @@ html {
     
   #todo-list .todo-location{
 	position: absolute;
-    right: 35px;
+    right: 30px;
     top: 12px;
     display: none;
     cursor: pointer;
@@ -253,7 +253,7 @@ html {
       }
 
 #instructions {
-  width: 520px;
+  max-width: 520px;
   margin: 10px auto;
   color: #777777;
   text-shadow: rgba(255, 255, 255, 0.8) 0 1px 0;
@@ -264,7 +264,7 @@ html {
   }
 
 #credits {
-  width: 520px;
+  max-width: 520px;
   margin: 30px auto;
   color: #999;
   text-shadow: rgba(255, 255, 255, 0.8) 0 1px 0;
