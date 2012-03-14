@@ -154,14 +154,12 @@ $(function(){
 	editTime: function() {
 		$(this.el).addClass("editingTime");
 		this.renderTime();
-		/* I may need to render Time JS here*/
 	},
 	
 	closeTime: function() {
 		$(this.el).removeClass("editingTime");
 		$(".timeInput").remove();
-		$(".dateInput").remove();
-		/* I may need to remove the calendar buttons*/
+
 	},
 	
 	
@@ -226,17 +224,11 @@ $(function(){
     },
 	
 	renderTime: function() {
-		this.$(".timeBlock").append("<input class='timeInput' type='text' size='20' value= 'Enter a Time'>");
-		//this.$(".timeBlock").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
-		this.$(".timeBlock").append("<input class='dateInput' type='text' size='20' value = 'Enter a Date'>");
-
-	
-	/*
+		this.$(".timeBlock").append("<input type='text' class='timeInput'  size='20' value= 'Enter a Time'>");
+				
 		this.$('.timeInput').datetimepicker({
 		ampm: true
 		});
-	*/
-
 		
 	},
 	
