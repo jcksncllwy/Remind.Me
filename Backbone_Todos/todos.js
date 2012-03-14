@@ -224,17 +224,19 @@ $(function(){
     },
 	
 	renderTime: function() {
+
 		this.$(".timeBlock").append("<input type='text' class='timeInput'  size='20' value= 'Enter a Time'>");
 				
 		this.$('.timeInput').datetimepicker({
 		ampm: true
 		});
-		
+
 	},
 	
 	
 	renderMap: function() {
 		var model = this.model;
+		
 		this.$(".location").append("<input class='searchTextField' type='text' size='50'>");
 		this.$(".location").append("<div style='height: 480px; width: 480px' class='map_canvas'></div>");
 		var mapOptions = {
@@ -249,7 +251,6 @@ $(function(){
         autocomplete.bindTo('bounds', map);
 		var markerList = new Array();
 		var infoWindowList = new Array();
-				
 				
 		/*
 		google.maps.event.addListener(map, 'bounds_changed', function (){
@@ -336,6 +337,7 @@ $(function(){
 					}
 					searchCompleted = true;
 				}
+				console.log(searchRequest);
 				service.search(searchRequest,searchCallback);
 			}
             else{
