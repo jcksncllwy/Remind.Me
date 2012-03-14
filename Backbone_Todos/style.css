@@ -1,0 +1,37 @@
+.brand{
+	font-family:'Leckerli One', cursive;
+}
+.accordion-inner > h1{
+	display:inline;
+}
+h1.time{
+	font-family:'Yanone Kaffeesatz', sans-serif;
+}
+h1.place{
+	font-family:'Yanone Kaffeesatz', sans-serif;
+}
+.accordion-heading{
+	font-family:'Yanone Kaffeesatz', sans-serif;
+}
+a.cal{
+	color:black;
+	
+}
+ul.cal{
+	list-style:none;
+	
+}
+ul.cal > li:first-child {
+    border-radius: 4px 4px 0 0;
+	background:#FF0000;
+	color: white;
+}
+ul.cal > li {
+	text-align:center;
+	font-family:'Helvetica', sans-serif;
+	font-weight: bold;
+	font-size: 16px;
+	padding: 1px;
+    border: 1px solid #DDDDDD;
+    border-radius: 0 0 4px 4px;
+}
