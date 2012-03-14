@@ -224,13 +224,27 @@ $(function(){
     },
 	
 	renderTime: function() {
-
+		var model = this.model;
+		
 		this.$(".timeBlock").append("<input type='text' class='timeInput'  size='20' value= 'Enter a Time'>");
-				
+		if(this.model.has('time')){
+			console.log('has time');
+			var time = model.get('time');
+			if(time!=undefined){
+				console.log('time is defined');
+				console.log(this.$('.timeInput'));
+				console.log(time);
+				this.$('.timeInput').val(time);
+			}
+		}	
 		this.$('.timeInput').datetimepicker({
-		ampm: true
+			ampm: true,
+			onClose: function(dateText, inst){
+				console.log('saving time');
+				model.save({time:dateText});
+			}
 		});
-
+		
 	},
 	
 	
